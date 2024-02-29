@@ -1,1 +1,1 @@
-from logic.business_scraper import Business_scraper
+from logic.business_scraper import BusinessScraper

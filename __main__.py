@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from logic import Business_scraper
+from logic import BusinessScraper
 
 # Env variables
 load_dotenv()
@@ -17,17 +17,16 @@ LANGUAGE = os.getenv("LANGUAGE")
 LICENSE = os.getenv("LICENSE")
 
 if __name__ == "__main__":
-    print("main", COMPANY_TYPE)
-    scraper = Business_scraper(KEYWORDS,
-                               HEADLESS,
-                               COMPANY_TYPE,
-                               COMPANY_SIZE,
-                               PROVINCE_HEADQUARTERS,
-                               TARGET_COMPANY_SIZE,
-                               CATEGORIES,
-                               SUBCATEGORIES,
-                               TYPE,
-                               LANGUAGE,
-                               LICENSE)
+    scraper = BusinessScraper(KEYWORDS,
+                              HEADLESS,
+                              COMPANY_TYPE,
+                              COMPANY_SIZE,
+                              PROVINCE_HEADQUARTERS,
+                              TARGET_COMPANY_SIZE,
+                              CATEGORIES,
+                              SUBCATEGORIES,
+                              TYPE,
+                              LANGUAGE,
+                              LICENSE)
 
     scraper.search()

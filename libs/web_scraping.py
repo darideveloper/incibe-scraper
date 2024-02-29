@@ -1,3 +1,4 @@
+import json
 import os
 import time
 import zipfile
@@ -130,6 +131,10 @@ class WebScraping ():
                 self.driver.add_cookie(cookie)
             except Exception:
                 pass
+
+    def save_cookies(self, cookies):
+        with open("cookies.json", "w") as file:
+            file.write(json.dumps(cookies))
 
     def __set_browser_instance__(self):
         """
@@ -463,6 +468,19 @@ class WebScraping ():
         # If the loop completes without finding the element, log an error
         self.logger.error(f"Timed out: Element '{selector}' not found on the page.")
 
+    def implicit_wait(self, selector, refresh: bool = False):
+        try:
+            WebDriverWait(self.get_browser(), 10).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, selector))
+            )
+        except Exception:
+            if refresh is False:
+                raise Exception(
+                    "Time out exeded. The element {} is until in the page".format(selector))
+            else:
+                self.get_browser().refresh()
+                time.sleep(3)
+
     def wait_die(self, selector, time_out=10):
         """
         Wait for an element to vanish from the page.
@@ -645,7 +663,8 @@ class WebScraping ():
             item (str, optional): CSS selector for a nested element. Defaults to None.
 
         Returns:
-            WebElement or None: WebElement object representing the found element, or None if not found.
+            WebElement or None: WebElement object representing the found element
+            or None if not found.
         """
         try:
             if isinstance(selector, str):

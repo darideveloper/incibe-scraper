@@ -1,3 +1,5 @@
+import re
+import time
 import itertools
 from urllib.parse import quote_plus
 from libs.web_scraping import WebScraping
@@ -180,7 +182,6 @@ class BusinessScraper(WebScraping):
 
         # Set all params
         for key, value in self.custom_filters.items():
-            print(value)
             if int(value) != 0:
                 params[str(key)] = self.filters[str(key)][int(value)]
 
@@ -190,8 +191,48 @@ class BusinessScraper(WebScraping):
         return url
 
     def search(self):
-        url = self.__generate_search_url__()
-        print(url)
+        selectors = {
+            "total_business": "div.list__info__data__total",
+            "business_list": ".list__company",
+            "business_name": ".mat-expansion-panel-header",
+            "expand": "mat-expansion-panel-header[aria-expanded='false']"
+        }
 
-    def extract_business(self):
-        pass
+        url = self.__generate_search_url__()
+        self.set_page(url)
+
+        # Wait till the element appears
+        self.implicit_wait(selectors["total_business"])
+
+        # Get business quantity
+        time.sleep(5)
+        business = self.get_text(selectors["total_business"])
+
+        # Extract numeric quantity value
+        business_values = re.search(r'\d+', business)
+        total_business = int(business_values.group())
+
+        self.extract_business(total_business, selectors)
+
+    def extract_business(self, business, selectors):
+        counter = int(business)
+
+        '''
+        page = 1 # Current page
+        self.__generate_search_url__(page=page)
+        page++
+        '''
+
+        elems = self.get_elems(selectors["business_list"])
+
+        print(f"Extrayendo datos de {counter} empresas...")
+
+        for item in range(0, len(elems)):
+            # Extract business's name
+            name_object = self.get_text(elems[item], selectors["business_name"])
+
+            # Clean business's name data
+            name = re.sub(r'[\s\n]*Empresa|[\n\r]+', '', name_object)
+
+            print(f"Extrayendo {name}...")
+

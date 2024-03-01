@@ -7,8 +7,9 @@ from libs.web_scraping import WebScraping
 
 class BusinessScraper(WebScraping):
     def __init__(self, keywords: list, headless: bool = False,
-                 companyType: int = 0, companySize: int = 0, provinceHeadquarters: int = 0,
-                 targetCompanySize: int = 0, categories: int = 0, subcategories: int = 0,
+                 companyType: int = 0, companySize: int = 0,
+                 provinceHeadquarters: int = 0, targetCompanySize: int = 0,
+                 categories: int = 0, subcategories: int = 0,
                  type: int = 0, language: int = 0, license: int = 0):
         """ Start chrome and save search text
 
@@ -136,7 +137,9 @@ class BusinessScraper(WebScraping):
     def __add_all_filters__(self):
         """Add all filters to the dictionary."""
         for filter_name, filter_options in self.all_filters.items():
-            self.filters[filter_name] = {i: option for i, option in enumerate(filter_options)}
+            self.filters[filter_name] = {
+                i: option for i, option in enumerate(filter_options)
+            }
 
     def __generate_all_combinations__(self):
         """Loop over all possible combinations
@@ -232,7 +235,9 @@ class BusinessScraper(WebScraping):
                 params[str(key)] = self.filters[str(key)][int(value)]
 
         # Construye la URL con los parámetros
-        url = base_url + "?" + "&".join([f"{key}={value}" for key, value in params.items()])
+        url = base_url + "?" + "&".join([
+            f"{key}={value}" for key, value in params.items()
+        ])
 
         return url
 
@@ -243,10 +248,12 @@ class BusinessScraper(WebScraping):
             "business_name": ".mat-expansion-panel-header",
             "expand": "mat-expansion-panel-header",
             "description": ".mat-expansion-panel-body .description",
-            "location": ".mat-expansion-panel-body .container .row .contact-data.mt-0 div",
+            "location": ".mat-expansion-panel-body"
+                        " .container .row .contact-data.mt-0 div",
             "phone": ".mat-expansion-panel-body .container .row .contact-data a",
             "email": ".mat-expansion-panel-body .container .row .contact-data.mt-0 a",
-            "website": ".mat-expansion-panel-body .container .row.mt-3 .contact-data:nth-child(2)"
+            "website": ".mat-expansion-panel-body .container"
+                       " .row.mt-3 .contact-data:nth-child(2)"
         }
 
         # Define current page
@@ -303,7 +310,12 @@ class BusinessScraper(WebScraping):
                 email = self.get_text(elems[item], selectors["email"])
 
                 website_object = self.get_text(elems[item], selectors["website"])
-                website = re.sub(r'^\s*wysiwyg\s*|\s*$', "", website_object, flags=re.MULTILINE)
+                website = re.sub(
+                    r'^\s*wysiwyg\s*|\s*$',
+                    "",
+                    website_object,
+                    flags=re.MULTILINE
+                )
 
                 # Store in a temporal list
                 temp = [name, description, location, phone, email, website]

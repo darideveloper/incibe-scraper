@@ -17,17 +17,19 @@ LANGUAGE = os.getenv("LANGUAGE")
 LICENSE = os.getenv("LICENSE")
 
 if __name__ == "__main__":
-    scraper = BusinessScraper(KEYWORDS,
-                              HEADLESS,
-                              COMPANY_TYPE,
-                              COMPANY_SIZE,
-                              PROVINCE_HEADQUARTERS,
-                              TARGET_COMPANY_SIZE,
-                              CATEGORIES,
-                              SUBCATEGORIES,
-                              TYPE,
-                              LANGUAGE,
-                              LICENSE)
+    scraper = BusinessScraper(
+        KEYWORDS,
+        HEADLESS,
+        COMPANY_TYPE,
+        COMPANY_SIZE,
+        PROVINCE_HEADQUARTERS,
+        TARGET_COMPANY_SIZE,
+        CATEGORIES,
+        SUBCATEGORIES,
+        TYPE,
+        LANGUAGE,
+        LICENSE
+    )
 
     extracted_data = scraper.search()
 

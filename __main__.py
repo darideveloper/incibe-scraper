@@ -29,4 +29,6 @@ if __name__ == "__main__":
                               LANGUAGE,
                               LICENSE)
 
-    scraper.search()
+    extracted_data = scraper.search()
+
+    print(extracted_data)

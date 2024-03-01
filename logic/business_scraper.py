@@ -156,12 +156,35 @@ class BusinessScraper(WebScraping):
         for combination in total_combinations:
             print(combination)
 
+    def __check_results__(self, selectors: str, tries: int = 3):
+        """Sometimes page fails to load
+        if this happen we do 2 attempts
+        if elements still doesn't appear
+        is because it isn't exists
+        """
+        while tries > 0:
+            try:
+                self.implicit_wait(selectors["total_business"])
+                return True
+            except Exception:
+                self.get_browser().refresh()
+                time.sleep(3)
+
+                if tries <= 1:
+                    return False
+
+            tries -= 1
+
     def __loop_results__(self, selectors: str, page: int = 0):
         url = self.__generate_search_url__(page=page)
         self.set_page(url)
 
         # Wait till the element appears
-        self.implicit_wait(selectors["total_business"])
+        found = self.__check_results__(selectors)
+
+        # If element isn't present return a empty list
+        if not found:
+            return []
 
         # Fetch Current elements
         elems = self.get_elems(selectors["business_list"])
@@ -218,36 +241,75 @@ class BusinessScraper(WebScraping):
             "total_business": "div.list__info__data__total",
             "business_list": ".list__company",
             "business_name": ".mat-expansion-panel-header",
-            "expand": "mat-expansion-panel-header[aria-expanded='false']"
+            "expand": "mat-expansion-panel-header",
+            "description": ".mat-expansion-panel-body .description",
+            "location": ".mat-expansion-panel-body .container .row .contact-data.mt-0 div",
+            "phone": ".mat-expansion-panel-body .container .row .contact-data a",
+            "email": ".mat-expansion-panel-body .container .row .contact-data.mt-0 a",
+            "website": ".mat-expansion-panel-body .container .row.mt-3 .contact-data:nth-child(2)"
         }
 
         # Define current page
         page = 0
 
         # Fetch target business quantity
-        _ = self.__loop_results__(selectors, page)
+        elems = self.__loop_results__(selectors, page)
+        if not elems:
+            print("No se encontraron resultados con esa combinacion de filtros.")
+            return []
+
         business = self.__get_counter__(selectors)
 
         print(f"Extrayendo datos de {business} empresas..")
 
-        self.extract_business(selectors, business)
+        return self.extract_business(selectors, business)
 
     def extract_business(self, selectors: str, business: int):
         counter = business
-
         page = 0
+
+        extracted_data = []
 
         while counter > 0:
             elems = self.__loop_results__(selectors, page)
+            if not elems:
+                print("Error de coneccion.")
+                break
 
+            # If elems aren't empty loop throug business's data
             for item in range(0, len(elems)):
                 # Extract business's name
+                time.sleep(3)
                 name_object = self.get_text(elems[item], selectors["business_name"])
 
-                # Clean business's name data
+                # Filter business's name values
                 name = re.sub(r'[\s\n]*Empresa|[\n\r]+', '', name_object)
 
                 print(f"Extrayendo {name}... {counter}/{business}")
+
+                # Extract business data
+                self.click_js(elems[item], selectors["expand"])
+
+                # Wait a few seconds to load data
+                time.sleep(3)
+
+                # harvest data
+                description = self.get_text(elems[item], selectors["description"])
+
+                location = self.get_text(elems[item], selectors["location"])
+
+                phone = self.get_text(elems[item], selectors["phone"])
+
+                email = self.get_text(elems[item], selectors["email"])
+
+                website_object = self.get_text(elems[item], selectors["website"])
+                website = re.sub(r'^\s*wysiwyg\s*|\s*$', "", website_object, flags=re.MULTILINE)
+
+                # Store in a temporal list
+                temp = [name, description, location, phone, email, website]
+
+                # Append to extracted data
+                extracted_data.append(temp)
 
                 counter -= 1
                 if counter == 0:
@@ -257,3 +319,5 @@ class BusinessScraper(WebScraping):
                 break
 
             page += 1
+
+        return extracted_data

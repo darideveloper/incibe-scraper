@@ -785,7 +785,7 @@ class WebScraping ():
         except Exception as e:
             self.logger.error(f"Error opening page: {e}")
 
-    def click_js(self, selector: str):
+    def click_js(self, selector, item: str = None):
         """
         Send a click using JavaScript, useful for hidden elements.
 
@@ -793,7 +793,14 @@ class WebScraping ():
             selector (str): CSS selector of the element to click.
         """
         try:
-            elem = self.driver.find_element(By.CSS_SELECTOR, selector)
+            if isinstance(selector, str):
+                elem = self.driver.find_element(By.CSS_SELECTOR, selector)
+            else:
+                elem = selector
+
+            if item is not None:
+                elem = elem.find_element(By.CSS_SELECTOR, item)
+
             self.driver.execute_script("arguments[0].click();", elem)
         except NoSuchElementException as e:
             self.logger.error(f"Element '{selector}' not found: {e}")

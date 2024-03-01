@@ -1,6 +1,5 @@
 import re
 import time
-import itertools
 from urllib.parse import quote_plus
 from libs.web_scraping import WebScraping
 
@@ -137,24 +136,6 @@ class BusinessScraper(WebScraping):
         """Add all filters to the dictionary."""
         for filter_name, filter_options in self.all_filters.items():
             self.filters[filter_name] = {i: option for i, option in enumerate(filter_options)}
-
-    def __generate_all_combinations__(self):
-        """Loop over all possible combinations
-        it still can generate duplicated entries
-        and it's not intended to be use in production yet
-        """
-        # Get the values of every filter
-        filter_values = list(self.filters.values())
-
-        # Calculate all posible combinations
-        total_combinations = list(itertools.product(*filter_values))
-
-        # Print the number of combinations
-        self.logger.info("Número total de combinaciones: %d", len(total_combinations))
-
-        # Loop through all combinations
-        for combination in total_combinations:
-            print(combination)
 
     def __check_results__(self, selectors: str, tries: int = 3):
         """Sometimes page fails to load

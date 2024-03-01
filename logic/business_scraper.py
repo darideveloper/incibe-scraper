@@ -156,8 +156,31 @@ class BusinessScraper(WebScraping):
         for combination in total_combinations:
             print(combination)
 
-    def __loop_results__(self):
-        pass
+    def __loop_results__(self, selectors: str, page: int = 0):
+        url = self.__generate_search_url__(page=page)
+        self.set_page(url)
+
+        # Wait till the element appears
+        self.implicit_wait(selectors["total_business"])
+
+        # Fetch Current elements
+        elems = self.get_elems(selectors["business_list"])
+
+        return elems
+
+    def __get_counter__(self, selectors: str):
+        # Get business quantity
+        time.sleep(5)
+        business = self.get_text(selectors["total_business"])
+
+        # Extract numeric quantity value
+        business_values = re.search(r'\d+', business)
+        total_business = int(business_values.group())
+
+        # Set business counter
+        counter = int(total_business)
+
+        return counter
 
     def __generate_search_url__(self, page: int = 0):
         """ companyType: Tipo de empresa
@@ -198,41 +221,39 @@ class BusinessScraper(WebScraping):
             "expand": "mat-expansion-panel-header[aria-expanded='false']"
         }
 
-        url = self.__generate_search_url__()
-        self.set_page(url)
+        # Define current page
+        page = 0
 
-        # Wait till the element appears
-        self.implicit_wait(selectors["total_business"])
+        # Fetch target business quantity
+        _ = self.__loop_results__(selectors, page)
+        business = self.__get_counter__(selectors)
 
-        # Get business quantity
-        time.sleep(5)
-        business = self.get_text(selectors["total_business"])
+        print(f"Extrayendo datos de {business} empresas..")
 
-        # Extract numeric quantity value
-        business_values = re.search(r'\d+', business)
-        total_business = int(business_values.group())
+        self.extract_business(selectors, business)
 
-        self.extract_business(total_business, selectors)
+    def extract_business(self, selectors: str, business: int):
+        counter = business
 
-    def extract_business(self, business, selectors):
-        counter = int(business)
+        page = 0
 
-        '''
-        page = 1 # Current page
-        self.__generate_search_url__(page=page)
-        page++
-        '''
+        while counter > 0:
+            elems = self.__loop_results__(selectors, page)
 
-        elems = self.get_elems(selectors["business_list"])
+            for item in range(0, len(elems)):
+                # Extract business's name
+                name_object = self.get_text(elems[item], selectors["business_name"])
 
-        print(f"Extrayendo datos de {counter} empresas...")
+                # Clean business's name data
+                name = re.sub(r'[\s\n]*Empresa|[\n\r]+', '', name_object)
 
-        for item in range(0, len(elems)):
-            # Extract business's name
-            name_object = self.get_text(elems[item], selectors["business_name"])
+                print(f"Extrayendo {name}... {counter}/{business}")
 
-            # Clean business's name data
-            name = re.sub(r'[\s\n]*Empresa|[\n\r]+', '', name_object)
+                counter -= 1
+                if counter == 0:
+                    break
 
-            print(f"Extrayendo {name}...")
+            if counter == 0:
+                break
 
+            page += 1

@@ -470,7 +470,7 @@ class WebScraping ():
 
     def implicit_wait(self, selector, refresh: bool = False):
         try:
-            WebDriverWait(self.get_browser(), 10).until(
+            WebDriverWait(self.get_browser(), 20).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, selector))
             )
         except Exception:

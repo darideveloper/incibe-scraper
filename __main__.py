@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from logic import BusinessScraper
+from logic.business_scraper import BusinessScraper
 from libs import SpreadsheetManager
 
 # Env variables
@@ -31,11 +31,20 @@ if __name__ == "__main__":
         LANGUAGE,
         LICENSE
     )
-
+    
+    # Get data
     data = scraper.search()
 
+    # Open excel file
     manager = SpreadsheetManager("empresas.xlsx")
-    manager.set_sheet("cyberseguridad")
+    
+    # Create sheet if not exists
+    manager.create_set_sheet("ciberseguridad")
+    
+    # Write header
+    header = ["Nombre", "Descripción", "Ubicación", "Teléfono", "Correo", "Sitio web"]
+    manager.write_data(header, start_row=1, start_column=1)
 
+    # Write content
     manager.write_data(data, start_row=2, start_column=1)
     manager.save()

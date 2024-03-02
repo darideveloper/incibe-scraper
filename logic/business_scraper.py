@@ -255,7 +255,7 @@ class BusinessScraper(WebScraping):
                 # Filter business's name values
                 name = re.sub(r'[\s\n]*Empresa|[\n\r]+', '', name_object)
 
-                print(f"Extrayendo {name}... {counter}/{business}")
+                print(f"Extrayendo {name}... {business - counter + 1}/{business}")
 
                 # Extract business data
                 self.click_js(elems[item], selectors["expand"])

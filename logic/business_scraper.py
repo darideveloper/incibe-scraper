@@ -141,34 +141,19 @@ class BusinessScraper(WebScraping):
             }
 
     def __check_results__(self, selectors: str, tries: int = 3):
-        """Sometimes page fails to load
-        if this happen we do 2 attempts
-        if elements still doesn't appear
-        is because it isn't exists
-        """
-        while tries > 0:
-            try:
-                self.implicit_wait(selectors["total_business"])
-                return True
-            except Exception:
-                self.get_browser().refresh()
-                time.sleep(3)
-
-                if tries <= 1:
-                    return False
-
-            tries -= 1
+        try:
+            self.refresh_selenium()
+            time.sleep(5)
+            self.implicit_wait(selectors["total_business"], True)
+        except Exception:
+            print("Problemas de coneccion")
 
     def __loop_results__(self, selectors: str, page: int = 0):
         url = self.__generate_search_url__(page=page)
         self.set_page(url)
 
         # Wait till the element appears
-        found = self.__check_results__(selectors)
-
-        # If element isn't present return a empty list
-        if not found:
-            return []
+        self.__check_results__(selectors)
 
         # Fetch Current elements
         elems = self.get_elems(selectors["business_list"])
@@ -260,14 +245,11 @@ class BusinessScraper(WebScraping):
 
         while counter > 0:
             elems = self.__loop_results__(selectors, page)
-            if not elems:
-                print("Error de coneccion.")
-                break
 
             # If elems aren't empty loop throug business's data
             for item in range(0, len(elems)):
                 # Extract business's name
-                time.sleep(3)
+                time.sleep(5)
                 name_object = self.get_text(elems[item], selectors["business_name"])
 
                 # Filter business's name values
@@ -279,7 +261,7 @@ class BusinessScraper(WebScraping):
                 self.click_js(elems[item], selectors["expand"])
 
                 # Wait a few seconds to load data
-                time.sleep(3)
+                time.sleep(5)
 
                 # harvest data
                 description = self.get_text(elems[item], selectors["description"])
@@ -308,9 +290,9 @@ class BusinessScraper(WebScraping):
                 if counter == 0:
                     break
 
+            page += 1
+
             if counter == 0:
                 break
-
-            page += 1
 
         return extracted_data

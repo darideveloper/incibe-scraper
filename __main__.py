@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 from logic import BusinessScraper
+from libs import SpreadsheetManager
 
 # Env variables
 load_dotenv()
@@ -31,6 +32,10 @@ if __name__ == "__main__":
         LICENSE
     )
 
-    extracted_data = scraper.search()
+    data = scraper.search()
 
-    print(extracted_data)
+    manager = SpreadsheetManager("empresas.xlsx")
+    manager.set_sheet("cyberseguridad")
+
+    manager.write_data(data, start_row=2, start_column=1)
+    manager.save()

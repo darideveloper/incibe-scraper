@@ -36,13 +36,30 @@ if __name__ == "__main__":
     data = scraper.search()
 
     # Open excel file
+    print("Escribiendo en el archivo excel...")
     manager = SpreadsheetManager("empresas.xlsx")
     
     # Create sheet if not exists
     manager.create_set_sheet("ciberseguridad")
     
     # Write header
-    header = ["Nombre", "Descripción", "Ubicación", "Teléfono", "Correo", "Sitio web"]
+    header = [[
+        "Nombre",
+        "Descripción",
+        "Ubicación",
+        "Teléfono",
+        "Correo",
+        "Sitio web"
+        "Typo de empresa",
+        "Tamaño de empresa",
+        "Provincia",
+        "Tamaño de empresa objetivo",
+        "Categorías",
+        "Subcategorías",
+        "Tipo",
+        "Idioma",
+        "Licencia"
+    ]]
     manager.write_data(header, start_row=1, start_column=1)
 
     # Write content

@@ -279,9 +279,27 @@ class BusinessScraper(WebScraping):
                     website_object,
                     flags=re.MULTILINE
                 )
+                
+                # Get filters values
+                filters_values = {}
+                for filter_name, filter_id in self.custom_filters.items():
+                    filter_value = self.filters[filter_name][int(filter_id)]
+                    filter_value = filter_value.replace("%20", " ").replace("%7C", "/")
+                    filters_values[filter_name] = filter_value
 
                 # Store in a temporal list
-                temp = [name, description, location, phone, email, website]
+                temp = [
+                    name,
+                    description,
+                    location,
+                    phone,
+                    email,
+                    website,
+                ]
+                
+                # Add filters values to register
+                for _, filter_value in filters_values.items():
+                    temp.append(filter_value)
 
                 # Append to extracted data
                 extracted_data.append(temp)

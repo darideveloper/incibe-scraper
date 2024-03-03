@@ -34,6 +34,9 @@ if __name__ == "__main__":
     
     # Get data
     data = scraper.search()
+    
+    # Skill browser when finish
+    scraper.driver.quit()
 
     # Open excel file
     print("Escribiendo en el archivo excel...")

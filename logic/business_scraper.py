@@ -143,7 +143,7 @@ class BusinessScraper(WebScraping):
     def __check_results__(self, selectors: str, tries: int = 3):
         try:
             self.refresh_selenium()
-            time.sleep(5)
+            time.sleep(10)
             self.implicit_wait(selectors["total_business"], True)
         except Exception:
             print("Problemas de coneccion")

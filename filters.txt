@@ -1,0 +1,82 @@
+companyType
+    0. Sin filtro
+    1. Consultoría Integrador
+    2. Mayorista/Distribuidor
+    4. Fabricante
+    5. Proveedores de seguridad gestionada
+    6. Proveedores especializados locales
+    7. Revendedor de valor añadido (VAR)
+
+companySize
+    0. Sin filtro
+    1. Pequeña empresa
+    2. Mediana empresa
+    3. Microempresa
+    4. Gran empresa
+
+provinceHeadquarters
+    0. Sin filtro
+    1. Madrid
+    2. Barcelona
+    3. Málaga
+    4. Valencia/València
+    5. Asturias
+    6. Las Palmas
+    7. Murcia
+    8. Alicante
+    9. Valladolid
+    10. Vizcaya
+
+targetCompanySize
+    0. Sin filtro
+    1. Mediana empresa
+    2. Pequeña empresa
+    3. Gran empresa
+    4. Microempresa
+
+categories
+    0. Sin filtro
+    1. Certificación normativa
+    2. Implantación de soluciones
+    3. Soporte y mantenimiento
+    4. Auditoría Técnica
+    5. Cumplimiento legal y normativo
+    6. Formación y concienciación
+    7. Contingencia y continuidad
+    8. Protección de las comunicaciones
+    9. Gestión de incidentes
+    10. Seguridad en la nube
+
+subcategories
+    0. Sin filtro
+    1. Sistemas de Gestión de la Seguridad de la Información
+    2. Diseño de soluciones
+    3. Seguridad Gestionada
+    4. Análisis de logs y puertos
+    5. Herramientas para el cumplimiento con la legislación
+    6. Formación académica (masters posgrados)
+    7. Planes de contingencia y continuidad de negocio
+    8. Cortafuegos
+    9. Prevención de incidentes de seguridad
+    10. Software como servicio (SaaS)
+
+type
+    0. Sin filtro
+    1. SERVICE
+    2. PRODUCT
+
+language
+    0. Sin filtro
+    1. español
+    2. inglés
+    3. catalán
+    4. alemán
+    5. francés
+    6. italiano
+    7. otros
+    8. portugués
+
+license
+    0. Sin filtro
+    1. false
+    2. true

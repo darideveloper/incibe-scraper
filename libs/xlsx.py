@@ -3,7 +3,7 @@ from openpyxl.styles import Font
 
 
 class SpreadsheetManager ():
-    """Manage local spread sheets
+    """ Manage local spread sheets
     """
 
     def __init__(self, file_name):
@@ -16,8 +16,11 @@ class SpreadsheetManager ():
             self.wb.save(filename=self.file_name)
         self.current_sheet = None
 
-    def get_sheets(self):
-        """ Return the list of sheets in the current document
+    def get_sheets(self) -> list:
+        """ Return all sheets in current workbook
+
+        Returns:
+            list: List of all sheets in current workbook
         """
 
         return self.wb.sheetnames
@@ -29,35 +32,63 @@ class SpreadsheetManager ():
         for sheet in self.wb.sheetnames:
             self.delete_sheet(sheet)
 
-    def delete_sheet(self, sheet_name):
+    def delete_sheet(self, sheet_name: str):
+        """ Delete a specific sheet in current workbook
+
+        Args:
+            sheet_name (str): Name of the sheet to be deleted
+        """
+        
         sheet_obj = self.wb[sheet_name]
         self.wb.remove(sheet_obj)
 
-    def create_set_sheet(self, sheet_name):
-        """ Create a new sheet with specific name, and set it as current sheet in class
+    def create_set_sheet(self, sheet_name: str):
+        """ Create a new sheet in current workbook (if not exists)
+        and set it as current sheet
+
+        Args:
+            sheet_name (str): Name of the new sheet
         """
+        
+        if sheet_name in self.get_sheets():
+            self.set_sheet(sheet_name)
+        else:
+            self.wb.create_sheet(sheet_name)
+            self.set_sheet(sheet_name)
 
-        self.wb.create_sheet(sheet_name)
-        self.set_sheet(sheet_name)
+    def set_sheet(self, sheet_name: str):
+        """ Set a specific sheet as current sheet
 
-    def set_sheet(self, sheet_name):
+        Args:
+            sheet_name (str): Name of the sheet to be set as current
+        """
 
         self.current_sheet = self.wb[sheet_name]
 
     def save(self):
-        """Save current workbook
+        """ Save current workbook
         """
 
         self.wb.save(self.file_name)
 
-    def write_cell(self, value="", row=1, column=1):
-        """ Write data in specific cell
+    def write_cell(self, value: str = "", row: int = 1, column: int = 1):
+        """ Write a value in a specific cell
+
+        Args:
+            value (str, optional): Value to be written. Defaults to "".
+            row (int, optional): Row number. Defaults to 1.
+            column (int, optional): Column number. Defaults to 1.
         """
 
         self.current_sheet.cell(row, column).value = value
 
-    def write_data(self, data=[], start_row=1, start_column=1):
-        """ Write data list starting in specific cell
+    def write_data(self, data: list = [], start_row: int = 1, start_column: int = 1):
+        """ Write a matrix of data in the current sheet
+
+        Args:
+            data (list, optional): Matrix of data. Defaults to [].
+            start_row (int, optional): Row number to start writing. Defaults to 1.
+            start_column (int, optional): Column number to start writing. Defaults to 1.
         """
 
         current_row = start_row
@@ -91,11 +122,17 @@ class SpreadsheetManager ():
             adjusted_width = (max_length + 2) * 1.2
             self.current_sheet.column_dimensions[column].width = adjusted_width
 
-    def format_range(self,
-                     start_cell=(1, 1),
-                     end_cell=(1, 1),
-                     italic=False,
-                     bold=False, font_size=8):
+    def format_range(self, start_cell: tuple = (1, 1), end_cell: tuple = (1, 1),
+                     italic: bool = False, bold: bool = False, font_size: int = 8):
+        """ Apply a specific style to a range of cells
+
+        Args:
+            start_cell (tuple, optional): Cell to start formatting. Defaults to (1, 1).
+            end_cell (tuple, optional): Cell to end formatting. Defaults to (1, 1).
+            italic (bool, optional): True if italic. Defaults to False.
+            bold (bool, optional): True if bold. Defaults to False.
+            font_size (int, optional): Font size. Defaults to 8.
+        """
 
         # Create font style
         formated_font = Font(size=font_size, italic=italic, bold=bold)
@@ -104,9 +141,9 @@ class SpreadsheetManager ():
         current_row = start_cell[0]
         current_column = start_cell[1]
 
-        for row in range(start_cell[0], end_cell[0] + 1):
+        for _ in range(start_cell[0], end_cell[0] + 1):
 
-            for cell_value in range(start_cell[1], end_cell[1] + 1):
+            for _ in range(start_cell[1], end_cell[1] + 1):
 
                 cell_obj = self.current_sheet.cell(current_row, current_column)
                 cell_obj.font = formated_font

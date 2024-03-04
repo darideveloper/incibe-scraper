@@ -242,6 +242,13 @@ class BusinessScraper(WebScraping):
         page = 0
 
         extracted_data = []
+        
+        # Get filters values
+        filters_values = {}
+        for filter_name, filter_id in self.custom_filters.items():
+            filter_value = self.filters[filter_name][int(filter_id)]
+            filter_value = filter_value.replace("%20", " ").replace("%7C", "/")
+            filters_values[filter_name] = filter_value
 
         while counter > 0:
             elems = self.__loop_results__(selectors, page)
@@ -279,13 +286,6 @@ class BusinessScraper(WebScraping):
                     website_object,
                     flags=re.MULTILINE
                 )
-                
-                # Get filters values
-                filters_values = {}
-                for filter_name, filter_id in self.custom_filters.items():
-                    filter_value = self.filters[filter_name][int(filter_id)]
-                    filter_value = filter_value.replace("%20", " ").replace("%7C", "/")
-                    filters_values[filter_name] = filter_value
 
                 # Store in a temporal list
                 temp = [

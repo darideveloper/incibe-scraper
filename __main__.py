@@ -52,7 +52,7 @@ if __name__ == "__main__":
         "Ubicación",
         "Teléfono",
         "Correo",
-        "Sitio web"
+        "Sitio web",
         "Typo de empresa",
         "Tamaño de empresa",
         "Provincia",

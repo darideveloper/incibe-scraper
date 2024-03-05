@@ -42,7 +42,11 @@ if __name__ == "__main__":
     print("Escribiendo en el archivo excel...")
     manager = SpreadsheetManager("empresas.xlsx")
     
-    # Create sheet if not exists
+    # Delete old sheet
+    sheet_name = "ciberseguridad"
+    manager.delete_sheet(sheet_name)
+    
+    # Create sheet if not exists, and set
     manager.create_set_sheet("ciberseguridad")
     
     # Write header

@@ -261,21 +261,41 @@ class BusinessScraper(WebScraping):
 
         while counter > 0:
             elems = self.__loop_results__(selectors, page, keyword)
+            time.sleep(5)
 
             # If elems aren't empty loop throug business's data
             for item in range(0, len(elems)):
-                # Extract business's name
-                time.sleep(5)
-                name_object = self.get_text(elems[item], selectors["business_name"])
+                # Extract business's name (try 3 times)
+                time.sleep(1)
+                extracted = False
+                for _ in range(3):
+                    try:
+                        name_object = self.get_text(
+                            elems[item],
+                            selectors["business_name"]
+                        )
+                    except Exception:
+                        print("Error al extraer, reintentando...")
+                        time.sleep(10)
+                        self.refresh_selenium()
+                        continue
+                    else:
+                        extracted = True
+                        
+                if not extracted:
+                    print("* Error al extraer datos en la página actual.")
+                    counter -= 25
+                    continue
 
                 # Filter business's name values
                 name = re.sub(r'[\s\n]*Empresa|[\n\r]+', '', name_object)
+                count_text = f"{business - counter + 1}/{business}"
                 if name in self.business_extracted:
-                    print(f"Empresa {name} ya extraída. {business - counter + 1}/{business}")
+                    print(f"Empresa {name} ya extraída. {count_text}")
                     counter -= 1
                     continue
 
-                print(f"Extrayendo {name}... {business - counter + 1}/{business}")
+                print(f"Extrayendo {name}... {count_text}")
 
                 # Extract business data
                 self.click_js(elems[item], selectors["expand"])

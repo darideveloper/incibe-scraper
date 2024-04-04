@@ -271,7 +271,7 @@ class BusinessScraper(WebScraping):
                 # Filter business's name values
                 name = re.sub(r'[\s\n]*Empresa|[\n\r]+', '', name_object)
                 if name in self.business_extracted:
-                    print(f"Empresa {name} ya extraída.")
+                    print(f"Empresa {name} ya extraída. {business - counter + 1}/{business}")
                     counter -= 1
                     continue
 

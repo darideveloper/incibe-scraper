@@ -20,7 +20,6 @@ LICENSE = os.getenv("LICENSE")
 if __name__ == "__main__":
     
     # Open excel file
-    print("Escribiendo en el archivo excel...")
     manager = SpreadsheetManager("empresas.xlsx")
     
     # Create sheet if not exists, and set
@@ -28,9 +27,10 @@ if __name__ == "__main__":
     manager.create_set_sheet("ciberseguridad")
     
     # Get business already extracted
-    print("Obteniendo empresas ya extraídas...")
+    print("\nObteniendo empresas ya extraídas...")
     data = manager.get_data()
     business_extracted = [row[0] for row in data[1:]]
+    last_row = len(data) + 1
     
     scraper = BusinessScraper(
         HEADLESS,
@@ -67,19 +67,24 @@ if __name__ == "__main__":
     manager.write_data(header, start_row=1, start_column=1)
     
     # Extract each keyword
-    full_data = []
     for keyword in KEYWORDS:
         print("\n______________________________")
-        print(f"Buscando empresas con la palabra clave: {keyword}")
+        print(f">>> Buscando empresas con la palabra clave: {keyword}")
         
         # Get data
         data = scraper.search(keyword)
+        if data:
+            print(f">>> Empresas nuevas encontradas: {len(data)}")
+        else:
+            print(">>> No se encontraron empresas con la palabra clave")
+            continue
         
         # Write content
-        manager.write_data(data, start_row=2, start_column=1)
+        manager.write_data(data, start_row=last_row, start_column=1)
         manager.save()
         
-        print()
+        # Update last row
+        last_row += len(data)
         
     # Skill browser when finish
     scraper.driver.quit()

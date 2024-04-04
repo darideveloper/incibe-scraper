@@ -5,11 +5,12 @@ from libs.web_scraping import WebScraping
 
 
 class BusinessScraper(WebScraping):
-    def __init__(self, keywords: list, headless: bool = False,
+    def __init__(self, headless: bool = False,
                  companyType: int = 0, companySize: int = 0,
                  provinceHeadquarters: int = 0, targetCompanySize: int = 0,
                  categories: int = 0, subcategories: int = 0,
-                 type: int = 0, language: int = 0, license: int = 0):
+                 type: int = 0, language: int = 0, license: int = 0,
+                 business_extracted: str = ""):
         """ Start chrome and save search text
 
         Args:
@@ -22,10 +23,6 @@ class BusinessScraper(WebScraping):
         super().__init__(
             headless=headless,
         )
-
-        # Get the url to search
-        keywords_str = " ".join(keywords)
-        self.search_text = f"{keywords_str}"
 
         # Custom filters
         self.custom_filters = {
@@ -132,6 +129,8 @@ class BusinessScraper(WebScraping):
 
         # Add all filters to dictionary
         self.__add_all_filters__()
+        
+        self.business_extracted = business_extracted
 
     def __add_all_filters__(self):
         """Add all filters to the dictionary."""
@@ -148,8 +147,8 @@ class BusinessScraper(WebScraping):
         except Exception:
             print("Problemas de coneccion")
 
-    def __loop_results__(self, selectors: str, page: int = 0):
-        url = self.__generate_search_url__(page=page)
+    def __loop_results__(self, selectors: str, page: int, keyword: str):
+        url = self.__generate_search_url__(page, keyword)
         self.set_page(url)
 
         # Wait till the element appears
@@ -174,7 +173,7 @@ class BusinessScraper(WebScraping):
 
         return counter
 
-    def __generate_search_url__(self, page: int = 0):
+    def __generate_search_url__(self, page: int, keyword: str):
         """ companyType: Tipo de empresa
             companySize: Tamaño de empresa
             provinceHeadquarters: Sede de empresa
@@ -192,7 +191,7 @@ class BusinessScraper(WebScraping):
         params = {
             "page": page,  # Página inicial
             "size": "25",  # Tamaño de página predeterminado
-            "text": quote_plus(self.search_text),  # Palabras clave de búsqueda
+            "text": quote_plus(keyword),  # Palabras clave de búsqueda
         }
 
         # Set all params
@@ -207,7 +206,16 @@ class BusinessScraper(WebScraping):
 
         return url
 
-    def search(self):
+    def search(self, keyword: str):
+        """ Search for a keyword and extract data
+
+        Args:
+            keyword (str): Keyword to search
+
+        Returns:
+            list: extracted data from businesses
+        """
+        
         selectors = {
             "total_business": "div.list__info__data__total",
             "business_list": ".list__company",
@@ -226,7 +234,7 @@ class BusinessScraper(WebScraping):
         page = 0
 
         # Fetch target business quantity
-        elems = self.__loop_results__(selectors, page)
+        elems = self.__loop_results__(selectors, page, keyword)
         if not elems:
             print("No se encontraron resultados con esa combinacion de filtros.")
             return []
@@ -235,9 +243,10 @@ class BusinessScraper(WebScraping):
 
         print(f"Extrayendo datos de {business} empresas..")
 
-        return self.extract_business(selectors, business)
-
-    def extract_business(self, selectors: str, business: int):
+        # Debug
+        return self.extract_business(selectors, business, keyword)
+    
+    def extract_business(self, selectors: str, business: int, keyword: str = ""):
         counter = business
         page = 0
 
@@ -251,7 +260,7 @@ class BusinessScraper(WebScraping):
             filters_values[filter_name] = filter_value
 
         while counter > 0:
-            elems = self.__loop_results__(selectors, page)
+            elems = self.__loop_results__(selectors, page, keyword)
 
             # If elems aren't empty loop throug business's data
             for item in range(0, len(elems)):
@@ -261,6 +270,10 @@ class BusinessScraper(WebScraping):
 
                 # Filter business's name values
                 name = re.sub(r'[\s\n]*Empresa|[\n\r]+', '', name_object)
+                if name in self.business_extracted:
+                    print(f"Empresa {name} ya extraída.")
+                    counter -= 1
+                    continue
 
                 print(f"Extrayendo {name}... {business - counter + 1}/{business}")
 
@@ -303,6 +316,9 @@ class BusinessScraper(WebScraping):
 
                 # Append to extracted data
                 extracted_data.append(temp)
+                
+                # Save business name
+                self.business_extracted.append(name)
 
                 counter -= 1
                 if counter == 0:

@@ -18,8 +18,21 @@ LANGUAGE = os.getenv("LANGUAGE")
 LICENSE = os.getenv("LICENSE")
 
 if __name__ == "__main__":
+    
+    # Open excel file
+    print("Escribiendo en el archivo excel...")
+    manager = SpreadsheetManager("empresas.xlsx")
+    
+    # Create sheet if not exists, and set
+    sheet_name = "ciberseguridad"
+    manager.create_set_sheet("ciberseguridad")
+    
+    # Get business already extracted
+    print("Obteniendo empresas ya extraídas...")
+    data = manager.get_data()
+    business_extracted = [row[0] for row in data[1:]]
+    
     scraper = BusinessScraper(
-        KEYWORDS,
         HEADLESS,
         COMPANY_TYPE,
         COMPANY_SIZE,
@@ -29,25 +42,9 @@ if __name__ == "__main__":
         SUBCATEGORIES,
         TYPE,
         LANGUAGE,
-        LICENSE
+        LICENSE,
+        business_extracted
     )
-    
-    # Get data
-    data = scraper.search()
-    
-    # Skill browser when finish
-    scraper.driver.quit()
-
-    # Open excel file
-    print("Escribiendo en el archivo excel...")
-    manager = SpreadsheetManager("empresas.xlsx")
-    
-    # Delete old sheet
-    sheet_name = "ciberseguridad"
-    manager.delete_sheet(sheet_name)
-    
-    # Create sheet if not exists, and set
-    manager.create_set_sheet("ciberseguridad")
     
     # Write header
     header = [[
@@ -68,7 +65,21 @@ if __name__ == "__main__":
         "Licencia"
     ]]
     manager.write_data(header, start_row=1, start_column=1)
-
-    # Write content
-    manager.write_data(data, start_row=2, start_column=1)
-    manager.save()
+    
+    # Extract each keyword
+    full_data = []
+    for keyword in KEYWORDS:
+        print("\n______________________________")
+        print(f"Buscando empresas con la palabra clave: {keyword}")
+        
+        # Get data
+        data = scraper.search(keyword)
+        
+        # Write content
+        manager.write_data(data, start_row=2, start_column=1)
+        manager.save()
+        
+        print()
+        
+    # Skill browser when finish
+    scraper.driver.quit()
